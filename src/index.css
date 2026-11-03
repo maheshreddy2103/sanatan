@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cinzel+Decorative:wght@700&family=Marcellus&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600;700&display=swap');
+
+:root {
+  --bg-primary: #fcf9f2;
+  --bg-secondary: #f6efe1;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fffdf9;
+  --bg-surface: #f1e6d2;
+  --text-primary: #2b1d15;
+  --text-secondary: #634f43;
+  --text-muted: #8c786c;
+  --border-light: rgba(212, 175, 55, 0.25);
+  --border-strong: rgba(184, 115, 51, 0.4);
+  --accent-saffron: #d9531e;
+  --accent-saffron-light: #fff3ec;
+  --accent-gold: #c69214;
+  --accent-gold-light: #fef9e7;
+  --accent-maroon: #801818;
+  --accent-teal: #1a6b63;
+  --shadow-sm: 0 2px 8px rgba(92, 53, 23, 0.06);
+  --shadow-md: 0 6px 20px rgba(92, 53, 23, 0.08);
+  --shadow-lg: 0 12px 32px rgba(92, 53, 23, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  --font-heading: 'Cinzel', serif;
+  --font-decorative: 'Cinzel Decorative', cursive;
+  --font-subheading: 'Marcellus', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-sanskrit: 'Noto Serif Devanagari', serif;
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f0c09;
+  --bg-secondary: #17130f;
+  --bg-card: #1d1713;
+  --bg-card-hover: #241d18;
+  --bg-surface: #2b221c;
+  --text-primary: #f5ebe1;
+  --text-secondary: #c9b7a7;
+  --text-muted: #948171;
+  --border-light: rgba(212, 175, 55, 0.18);
+  --border-strong: rgba(212, 175, 55, 0.35);
+  --accent-saffron: #f26d36;
+  --accent-saffron-light: #2b170e;
+  --accent-gold: #e5b32e;
+  --accent-gold-light: #2a200a;
+  --accent-maroon: #b33939;
+  --accent-teal: #2db3a6;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-body);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.65;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(217, 83, 30, 0.03) 0%, transparent 40%);
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.font-decorative {
+  font-family: var(--font-decorative);
+}
+
+.font-subheading {
+  font-family: var(--font-subheading);
+}
+
+.font-sanskrit {
+  font-family: var(--font-sanskrit);
+}
+
+a {
+  color: var(--accent-saffron);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-gold);
+}
+
+/* Layout container */
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-body);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #d9531e 0%, #b3390c 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(217, 83, 30, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(217, 83, 30, 0.4);
+  color: #ffffff;
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  background: var(--bg-surface);
+  border-color: var(--accent-gold);
+  color: var(--accent-saffron);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #aa841f 100%);
+  color: #1a1202;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+}
+
+/* Cards */
+.sanatan-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.sanatan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+  background: var(--bg-card-hover);
+}
+
+.sanatan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sanatan-card:hover::before {
+  opacity: 1;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-saffron {
+  background-color: var(--accent-saffron-light);
+  color: var(--accent-saffron);
+  border: 1px solid rgba(217, 83, 30, 0.2);
+}
+
+.badge-gold {
+  background-color: var(--accent-gold-light);
+  color: var(--accent-gold);
+  border: 1px solid rgba(198, 146, 20, 0.25);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-saffron);
+}
+
+/* Om watermark effect */
+.om-watermark {
+  position: relative;
+}
+
+.om-watermark::after {
+  content: 'ॐ';
+  position: absolute;
+  font-family: var(--font-sanskrit);
+  font-size: 16rem;
+  color: var(--accent-gold);
+  opacity: 0.03;
+  right: -2rem;
+  bottom: -4rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Classical Table Styling */
+.classical-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.classical-table th {
+  background: linear-gradient(135deg, var(--accent-maroon) 0%, #4a0d0d 100%);
+  color: #fef2d0;
+  padding: 16px 20px;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  text-align: left;
+  border-bottom: 2px solid var(--accent-gold);
+}
+
+.classical-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.classical-table tr:nth-child(even) td {
+  background-color: var(--bg-secondary);
+}
+
+.classical-table tr:hover td {
+  background-color: var(--accent-gold-light);
+}
+
