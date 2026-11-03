@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import GlobalSearchModal from './components/GlobalSearchModal';
+import SanatanMitrChatbot from './components/SanatanMitrChatbot';
 
 // Pages
 import HomeView from './pages/HomeView';
@@ -183,6 +184,9 @@ export default function App() {
         onClose={() => setIsSearchOpen(false)}
         onNavigate={navigateTo}
       />
+
+      {/* Floating Vedic AI Spiritual Guide (सनातन मित्र) */}
+      <SanatanMitrChatbot onNavigate={navigateTo} />
     </div>
   );
 }

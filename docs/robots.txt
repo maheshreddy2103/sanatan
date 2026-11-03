@@ -4,3 +4,4 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://maheshreddy2103.github.io/sanatan/sitemap.xml
+
