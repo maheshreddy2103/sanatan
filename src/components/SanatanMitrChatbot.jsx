@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  MessageSquare, X, Send, Sparkles, Key, 
-  Trash2, ExternalLink, ShieldCheck, ChevronDown, 
+  X, Send, Sparkles, Key, 
+  Trash2, ExternalLink, ShieldCheck,
   BookOpen, Calendar, MapPin, Compass
 } from 'lucide-react';
 import { queryLocalVedicBrain, queryGeminiAI } from '../utils/vedicChatbotBrain';
@@ -37,6 +37,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [tempKey, setTempKey] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Sync session messages
@@ -100,7 +101,6 @@ export default function SanatanMitrChatbot({ onNavigate }) {
       const localResult = queryLocalVedicBrain(query);
 
       if (localResult) {
-        // Instant local response found!
         const botMsg = {
           id: 'bot-' + Date.now(),
           sender: 'bot',
@@ -162,7 +162,6 @@ export default function SanatanMitrChatbot({ onNavigate }) {
     }
   };
 
-  // General Vedic wisdom fallback when no API key is set
   const getGeneralVedicWisdom = (q) => {
     return `🙏 **Wisdom of Sanatan Dharma**\n\n` +
            `"यतो धर्मस्ततो जयः" (*Where there is Dharma, there is Victory.*)\n\n` +
@@ -177,29 +176,78 @@ export default function SanatanMitrChatbot({ onNavigate }) {
   return (
     <>
       {/* Floating Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}
+      >
         {!isOpen && (
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-900/90 text-amber-100 text-xs font-serif border border-amber-500/40 shadow-lg backdrop-blur-md animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <div 
+            onClick={() => setIsOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              fontSize: '13px',
+              fontWeight: '600',
+              fontFamily: 'var(--font-heading)',
+              border: '1px solid var(--border-strong)',
+              boxShadow: 'var(--shadow-md)',
+              cursor: 'pointer',
+              userSelect: 'none'
+            }}
+          >
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              display: 'inline-block'
+            }}></span>
             <span>सनातन मित्र • Ask Anything</span>
           </div>
         )}
 
         <button
           onClick={() => setIsOpen(!isOpen)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           aria-label="Open Vedic AI Spiritual Guide"
-          className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-amber-700 via-amber-600 to-orange-500 text-amber-50 shadow-2xl shadow-amber-900/40 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center border-2 border-amber-300/80 group"
+          style={{
+            position: 'relative',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #d9531e 0%, #c69214 100%)',
+            color: '#ffffff',
+            boxShadow: isHovered 
+              ? '0 12px 30px rgba(217, 83, 30, 0.55)' 
+              : '0 8px 24px rgba(217, 83, 30, 0.4)',
+            transform: isHovered ? 'scale(1.08)' : 'scale(1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px solid rgba(255, 230, 160, 0.85)',
+            cursor: 'pointer',
+            transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+            outline: 'none',
+            fontSize: '26px'
+          }}
         >
           {isOpen ? (
-            <X className="w-6 h-6 transition-transform duration-200 group-hover:rotate-90" />
+            <X style={{ width: '26px', height: '26px', strokeWidth: 2.5 }} />
           ) : (
-            <>
-              <span className="text-2xl font-serif select-none">🕉️</span>
-              <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border border-amber-200"></span>
-              </span>
-            </>
+            <span>🕉️</span>
           )}
         </button>
       </div>
@@ -207,86 +255,189 @@ export default function SanatanMitrChatbot({ onNavigate }) {
       {/* Main Chat Drawer / Window */}
       {isOpen && (
         <div 
-          className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[440px] h-[580px] max-h-[82vh] bg-[#FFFDF8] rounded-2xl shadow-2xl border border-amber-300/80 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans"
-          style={{ boxShadow: '0 20px 50px rgba(120, 53, 15, 0.25)' }}
+          style={{
+            position: 'fixed',
+            bottom: '96px',
+            right: '24px',
+            zIndex: 9999,
+            width: 'min(460px, calc(100vw - 32px))',
+            height: 'min(620px, calc(100vh - 120px))',
+            backgroundColor: 'var(--bg-card)',
+            color: 'var(--text-primary)',
+            borderRadius: '20px',
+            border: '1px solid var(--border-strong)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            fontFamily: 'var(--font-body)'
+          }}
         >
           {/* Header */}
-          <div className="relative bg-gradient-to-r from-amber-900 via-stone-900 to-amber-950 text-amber-100 px-4 py-3.5 border-b border-amber-600/40 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl shadow-inner">
+          <div style={{
+            padding: '14px 18px',
+            background: 'linear-gradient(135deg, #801818 0%, #2b1d15 100%)',
+            color: '#fef9e7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.3)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px'
+              }}>
                 🕉️
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-serif font-bold text-amber-200 text-sm tracking-wide">
-                    Sanatan Mitr <span className="text-amber-400 text-xs font-normal">सनातन मित्र</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: '700',
+                    fontSize: '15px',
+                    color: '#fef9e7',
+                    margin: 0
+                  }}>
+                    Sanatan Mitr <span style={{ color: '#e5b32e', fontSize: '12px', fontWeight: 'normal' }}>सनातन मित्र</span>
                   </h3>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-                    Hybrid AI
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: '600',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                    color: '#6ee7b7',
+                    border: '1px solid rgba(16, 185, 129, 0.4)'
+                  }}>
+                    Hybrid
                   </span>
                 </div>
-                <p className="text-[11px] text-amber-300/80">
+                <p style={{
+                  fontSize: '11px',
+                  color: 'rgba(254, 249, 231, 0.75)',
+                  margin: '2px 0 0 0'
+                }}>
                   {apiKey ? '✨ Google Gemini AI Connected' : '⚡ Local Vedic Knowledge Active'}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <button
                 onClick={() => {
                   setTempKey(apiKey);
                   setShowKeyModal(true);
                 }}
                 title={apiKey ? "Gemini API Key Configured" : "Add Free Gemini API Key"}
-                className={`p-1.5 rounded-lg text-xs transition-colors border ${
-                  apiKey 
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30' 
-                    : 'bg-stone-800/80 text-amber-200/70 border-stone-700 hover:text-amber-200'
-                }`}
+                style={{
+                  padding: '7px',
+                  borderRadius: '8px',
+                  backgroundColor: apiKey ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+                  color: apiKey ? '#e5b32e' : '#fef9e7',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <Key className="w-4 h-4" />
+                <Key style={{ width: '15px', height: '15px' }} />
               </button>
 
               <button
                 onClick={handleClearHistory}
                 title="Clear conversation"
-                className="p-1.5 rounded-lg bg-stone-800/80 text-amber-200/70 border border-stone-700 hover:text-amber-200 transition-colors"
+                style={{
+                  padding: '7px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: '#fef9e7',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 style={{ width: '15px', height: '15px' }} />
               </button>
 
               <button
                 onClick={() => setIsOpen(false)}
                 title="Close chat"
-                className="p-1.5 rounded-lg bg-stone-800/80 text-amber-200/70 border border-stone-700 hover:text-amber-200 transition-colors"
+                style={{
+                  padding: '7px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: '#fef9e7',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <X className="w-4 h-4" />
+                <X style={{ width: '15px', height: '15px' }} />
               </button>
             </div>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-gradient-to-b from-amber-50/40 via-stone-50/20 to-amber-50/50 scroll-smooth">
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            backgroundColor: 'var(--bg-primary)'
+          }}>
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start'
+                }}
               >
                 <div
-                  className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm leading-relaxed shadow-sm ${
-                    msg.sender === 'user'
-                      ? 'bg-gradient-to-r from-amber-700 to-amber-800 text-white rounded-br-none'
-                      : 'bg-white text-stone-800 border border-amber-200/90 rounded-bl-none shadow-amber-900/5'
-                  }`}
+                  style={{
+                    maxWidth: '88%',
+                    borderRadius: msg.sender === 'user' ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                    padding: '12px 16px',
+                    fontSize: '13.5px',
+                    lineHeight: '1.6',
+                    background: msg.sender === 'user'
+                      ? 'linear-gradient(135deg, #d9531e 0%, #b84314 100%)'
+                      : 'var(--bg-card)',
+                    color: msg.sender === 'user' ? '#ffffff' : 'var(--text-primary)',
+                    border: msg.sender === 'user' ? 'none' : '1px solid var(--border-light)',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
                 >
                   {/* Message formatted content */}
-                  <div className="whitespace-pre-wrap space-y-1">
+                  <div style={{ whiteSpace: 'pre-wrap' }}>
                     {formatMessageContent(msg.text)}
                   </div>
 
                   {/* Optional Action Button */}
                   {msg.action && (
-                    <div className="mt-2.5 pt-2 border-t border-amber-100 flex justify-end">
+                    <div style={{
+                      marginTop: '10px',
+                      paddingTop: '8px',
+                      borderTop: '1px solid var(--border-light)',
+                      display: 'flex',
+                      justifyContent: 'flex-end'
+                    }}>
                       <button
                         onClick={() => {
                           if (onNavigate) {
@@ -296,35 +447,70 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                           }
                           setIsOpen(false);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 transition-all shadow-sm active:scale-95"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 14px',
+                          borderRadius: '9999px',
+                          backgroundColor: 'var(--accent-saffron)',
+                          color: '#ffffff',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          border: 'none',
+                          cursor: 'pointer',
+                          boxShadow: 'var(--shadow-sm)'
+                        }}
                       >
                         <span>{msg.action.label}</span>
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink style={{ width: '13px', height: '13px' }} />
                       </button>
                     </div>
                   )}
 
                   {/* Connect API Key banner */}
                   {msg.needsKey && !apiKey && (
-                    <div className="mt-2.5 pt-2 border-t border-amber-200/60">
+                    <div style={{
+                      marginTop: '10px',
+                      paddingTop: '8px',
+                      borderTop: '1px solid var(--border-light)'
+                    }}>
                       <button
                         onClick={() => {
                           setTempKey(apiKey);
                           setShowKeyModal(true);
                         }}
-                        className="w-full text-left p-2 rounded-lg bg-amber-50 border border-amber-300 text-[11px] text-amber-900 flex items-center justify-between hover:bg-amber-100/80 transition-colors"
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '8px 12px',
+                          borderRadius: '10px',
+                          backgroundColor: 'var(--accent-gold-light)',
+                          border: '1px solid var(--border-strong)',
+                          fontSize: '11px',
+                          color: 'var(--text-primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <span className="flex items-center gap-1.5 font-medium">
-                          <Key className="w-3.5 h-3.5 text-amber-700" />
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600' }}>
+                          <Key style={{ width: '14px', height: '14px', color: 'var(--accent-saffron)' }} />
                           <span>Connect Free Google Gemini AI Key</span>
                         </span>
-                        <span className="text-[10px] text-amber-700 underline font-semibold">Setup →</span>
+                        <span style={{ color: 'var(--accent-saffron)', fontWeight: '700' }}>Setup →</span>
                       </button>
                     </div>
                   )}
                 </div>
 
-                <span className="text-[10px] text-stone-400 mt-1 px-1">
+                <span style={{
+                  fontSize: '10px',
+                  color: 'var(--text-muted)',
+                  marginTop: '4px',
+                  padding: '0 4px'
+                }}>
                   {msg.timestamp} {msg.source === 'gemini' && '• Gemini AI'}
                 </span>
               </div>
@@ -332,9 +518,21 @@ export default function SanatanMitrChatbot({ onNavigate }) {
 
             {/* Loading Indicator */}
             {isLoading && (
-              <div className="flex items-center gap-2 text-stone-500 text-xs bg-white border border-amber-200 rounded-xl px-3 py-2 w-fit shadow-sm">
-                <span className="text-sm animate-spin">🕉️</span>
-                <span className="italic text-stone-600">Sanatan Mitr is contemplating wisdom...</span>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--text-muted)',
+                fontSize: '12px',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '12px',
+                padding: '8px 14px',
+                width: 'fit-content',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <span style={{ fontSize: '15px' }}>🕉️</span>
+                <span style={{ fontStyle: 'italic' }}>Sanatan Mitr is contemplating wisdom...</span>
               </div>
             )}
 
@@ -343,14 +541,37 @@ export default function SanatanMitrChatbot({ onNavigate }) {
 
           {/* Quick Starter Prompts Chips */}
           {messages.length <= 3 && (
-            <div className="px-3 py-2 bg-amber-50/80 border-t border-amber-200/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <div style={{
+              padding: '8px 12px',
+              backgroundColor: 'var(--bg-secondary)',
+              borderTop: '1px solid var(--border-light)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap'
+            }}>
               {STARTER_PROMPTS.map((prompt, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(prompt.text)}
-                  className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-stone-700 hover:text-amber-900 border border-amber-300/80 text-[11px] hover:bg-amber-100/60 hover:border-amber-400 transition-all shadow-xs"
+                  style={{
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 12px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-light)',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
                 >
-                  <prompt.icon className="w-3 h-3 text-amber-700" />
+                  <prompt.icon style={{ width: '12px', height: '12px', color: 'var(--accent-saffron)' }} />
                   <span>{prompt.label}</span>
                 </button>
               ))}
@@ -358,7 +579,14 @@ export default function SanatanMitrChatbot({ onNavigate }) {
           )}
 
           {/* Input Area */}
-          <div className="p-3 bg-white border-t border-amber-200 flex items-center gap-2">
+          <div style={{
+            padding: '12px 16px',
+            backgroundColor: 'var(--bg-card)',
+            borderTop: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
             <input
               type="text"
               value={input}
@@ -367,15 +595,38 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                 if (e.key === 'Enter') handleSend();
               }}
               placeholder="Ask about Panchang, Temples, Mantras, Gita..."
-              className="flex-1 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl bg-stone-50 border border-amber-300/80 text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500"
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                borderRadius: '12px',
+                backgroundColor: 'var(--bg-primary)',
+                border: '1px solid var(--border-strong)',
+                color: 'var(--text-primary)',
+                fontSize: '13.5px',
+                outline: 'none',
+                fontFamily: 'inherit'
+              }}
             />
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || isLoading}
               aria-label="Send message"
-              className="p-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95"
+              style={{
+                padding: '10px 16px',
+                borderRadius: '12px',
+                background: (!input.trim() || isLoading)
+                  ? 'var(--text-muted)'
+                  : 'linear-gradient(135deg, #d9531e 0%, #c69214 100%)',
+                color: '#ffffff',
+                border: 'none',
+                cursor: (!input.trim() || isLoading) ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--shadow-sm)'
+              }}
             >
-              <Send className="w-4 h-4" />
+              <Send style={{ width: '16px', height: '16px' }} />
             </button>
           </div>
         </div>
@@ -383,48 +634,102 @@ export default function SanatanMitrChatbot({ onNavigate }) {
 
       {/* Google Gemini API Key Modal */}
       {showKeyModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in font-sans">
-          <div className="bg-[#FFFDF8] max-w-md w-full rounded-2xl shadow-2xl border border-amber-300 p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-amber-200 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">✨</span>
-                <h3 className="font-serif font-bold text-amber-950 text-base">
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            maxWidth: '460px',
+            width: '100%',
+            backgroundColor: 'var(--bg-card)',
+            color: 'var(--text-primary)',
+            borderRadius: '20px',
+            border: '1px solid var(--border-strong)',
+            padding: '24px',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.4)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            fontFamily: 'var(--font-body)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid var(--border-light)',
+              paddingBottom: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '22px' }}>✨</span>
+                <h3 style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: '700',
+                  fontSize: '17px',
+                  margin: 0
+                }}>
                   Connect Google Gemini AI
                 </h3>
               </div>
               <button
                 onClick={() => setShowKeyModal(false)}
-                className="text-stone-400 hover:text-stone-700 p-1"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '20px', height: '20px' }} />
               </button>
             </div>
 
-            <p className="text-xs text-stone-600 leading-relaxed">
+            <p style={{ fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
               To unlock full conversational AI with **Sanatan Mitr** for deep spiritual questions, connect a free API key from **Google AI Studio**.
             </p>
 
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/80 space-y-1.5 text-xs text-amber-950">
-              <div className="font-semibold flex items-center gap-1.5 text-amber-900">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <div style={{
+              padding: '14px',
+              borderRadius: '12px',
+              backgroundColor: 'var(--accent-gold-light)',
+              border: '1px solid var(--border-strong)',
+              fontSize: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
+            }}>
+              <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-saffron)' }}>
+                <ShieldCheck style={{ width: '16px', height: '16px', color: '#10b981' }} />
                 <span>100% Free & Private</span>
               </div>
-              <p className="text-[11px] text-stone-600">
+              <p style={{ margin: 0, lineHeight: '1.5', color: 'var(--text-secondary)' }}>
                 • Google provides a free API key with no credit card required.<br />
-                • Your key is saved locally in your own browser's storage and is never sent to our servers.
+                • Your key is saved locally in your own browser's storage and is never sent to any external server.
               </p>
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 hover:underline pt-1"
+                style={{
+                  fontWeight: '700',
+                  color: 'var(--accent-saffron)',
+                  textDecoration: 'underline',
+                  marginTop: '4px'
+                }}
               >
                 Get your free API key from Google AI Studio →
               </a>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-stone-700">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '600' }}>
                 Gemini API Key
               </label>
               <input
@@ -432,11 +737,28 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                 value={tempKey}
                 onChange={(e) => setTempKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full text-xs font-mono px-3 py-2.5 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                style={{
+                  width: '100%',
+                  fontSize: '13px',
+                  fontFamily: 'monospace',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-strong)',
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-primary)',
+                  outline: 'none'
+                }}
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-amber-200">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '8px',
+              paddingTop: '8px',
+              borderTop: '1px solid var(--border-light)'
+            }}>
               {apiKey && (
                 <button
                   onClick={() => {
@@ -445,20 +767,48 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                     localStorage.removeItem('gemini_api_key');
                     setShowKeyModal(false);
                   }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 border border-red-200 transition-colors"
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#dc2626',
+                    backgroundColor: 'transparent',
+                    border: '1px solid rgba(220, 38, 38, 0.3)',
+                    cursor: 'pointer'
+                  }}
                 >
                   Remove Key
                 </button>
               )}
               <button
                 onClick={() => setShowKeyModal(false)}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-100 transition-colors"
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-light)',
+                  cursor: 'pointer'
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveKey}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: '#ffffff',
+                  background: 'linear-gradient(135deg, #d9531e 0%, #c69214 100%)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)'
+                }}
               >
                 Save Key
               </button>
@@ -479,7 +829,15 @@ function formatMessageContent(text) {
     // Quote lines
     if (line.startsWith('>')) {
       return (
-        <blockquote key={idx} className="border-l-2 border-amber-500 pl-2 italic text-stone-700 my-1 bg-amber-50/40 py-0.5 rounded-r">
+        <blockquote key={idx} style={{
+          borderLeft: '3px solid var(--accent-gold)',
+          paddingLeft: '10px',
+          fontStyle: 'italic',
+          margin: '6px 0',
+          backgroundColor: 'var(--accent-gold-light)',
+          padding: '4px 10px',
+          borderRadius: '0 8px 8px 0'
+        }}>
           {renderFormattedInline(line.replace(/^>\s*/, ''))}
         </blockquote>
       );
@@ -488,16 +846,16 @@ function formatMessageContent(text) {
     // Bullet lines
     if (line.startsWith('•') || line.startsWith('-')) {
       return (
-        <div key={idx} className="flex items-start gap-1.5 pl-1 my-0.5">
-          <span className="text-amber-600 font-bold">•</span>
-          <span className="flex-1">{renderFormattedInline(line.replace(/^[•-]\s*/, ''))}</span>
+        <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', margin: '3px 0' }}>
+          <span style={{ color: 'var(--accent-saffron)', fontWeight: 'bold' }}>•</span>
+          <span style={{ flex: 1 }}>{renderFormattedInline(line.replace(/^[•-]\s*/, ''))}</span>
         </div>
       );
     }
 
     // Regular line
     return (
-      <p key={idx} className="my-0.5 min-h-[1em]">
+      <p key={idx} style={{ margin: '3px 0', minHeight: '1em' }}>
         {renderFormattedInline(line)}
       </p>
     );
@@ -505,11 +863,10 @@ function formatMessageContent(text) {
 }
 
 function renderFormattedInline(str) {
-  // Bold matches: **text**
   const parts = str.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold text-amber-950">{part.slice(2, -2)}</strong>;
+      return <strong key={i} style={{ fontWeight: '700', color: 'var(--accent-saffron)' }}>{part.slice(2, -2)}</strong>;
     }
     return part;
   });
