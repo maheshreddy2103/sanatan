@@ -1,7 +1,10 @@
 /**
  * Vedic Chatbot Brain (सनातन मित्र Engine)
- * Layer 1: Zero-API Instant Local Knowledge Retrieval
- * Layer 2: Google Gemini Generative AI Spiritual Guide
+ * Layer 1: Zero-API Instant High-Precision Local Knowledge (Panchang, 6.5L+ Temples, Mantras, Festivals)
+ * Layer 2: High-Speed OpenRouter AI (DeepSeek, Claude, Llama) with User Key
+ * Layer 3: Dedicated Google Gemini Generative AI (1.5 / 2.0 Flash)
+ * Layer 4: Free Zero-Config Universal Vedic AI (Open-ended Prashna Engine - No Key Required!)
+ * Layer 5: Deep Offline Scriptural Matrix Fallback
  */
 
 import { getPanchanga } from './panchang';
@@ -15,16 +18,17 @@ import { practicesData } from '../data/practicesData';
 import { beliefsData } from '../data/beliefsData';
 import { STATE_TEMPLE_STATS, TOTAL_MAPPED_TEMPLES } from '../data/templesPortalData';
 
-// System prompt for Gemini AI
-const VEDIC_SYSTEM_INSTRUCTION = `You are "Sanatan Mitr" (सनातन मित्र), a compassionate, wise, and deeply enlightened Vedic scholar and spiritual guide rooted in authentic Sanatan Dharma.
-- Address seekers with warmth and respect (e.g. "Namaste", "Dear Seeker", "Pranam").
+// Core Vedic System Persona
+export const VEDIC_SYSTEM_INSTRUCTION = `You are "Sanatan Mitr" (सनातन मित्र), a compassionate, wise, and deeply enlightened Vedic scholar and spiritual guide rooted in authentic Sanatan Dharma.
+- Address seekers with warmth and reverence (e.g. "Namaste", "Dear Seeker", "Pranam", "ॐ Shanti").
 - Ground your answers in authentic scriptures: the Vedas, Upanishads, Bhagavad Gita, Ramayana, Mahabharata, and Puranas.
 - When answering philosophical questions, cite relevant Sanskrit verses or shlokas when helpful, followed by clear translation and life application.
 - Emphasize Dharma (righteous living), Satya (truth), Ahimsa (non-violence), Karma Yoga (selfless duty), and Moksha (spiritual liberation).
-- Maintain an elevating, dignified, calm, and peaceful tone. Format responses with clean paragraphs and readable bullet points.`;
+- Answer ANY question on Sanatan Dharma, life dilemmas, ethical quandaries, rituals, mantras, or mythology with clarity, balance, and profound respect.
+- Support queries in English, Hindi, and Indian regional languages gracefully. Format responses with clean paragraphs and readable bullet points.`;
 
 /**
- * Layer 1: Query Local Datasets without API
+ * Layer 1: Query Local High-Precision Datasets (Instant, Zero Delay)
  */
 export function queryLocalVedicBrain(rawQuery) {
   const query = rawQuery.toLowerCase().trim();
@@ -77,7 +81,6 @@ export function queryLocalVedicBrain(rawQuery) {
     query.includes('jagannath') ||
     query.includes('ayodhya')
   ) {
-    // Check if specific state mentioned
     for (const stateData of STATE_TEMPLE_STATS) {
       if (query.includes(stateData.name.toLowerCase()) || query.includes(stateData.id.replace(/-/g, ' '))) {
         const topTemples = stateData.iconicTemples || [];
@@ -182,7 +185,6 @@ export function queryLocalVedicBrain(rawQuery) {
       };
     }
 
-    // Match any specific festival from MAJOR_FESTIVALS_DATA
     for (const fest of MAJOR_FESTIVALS_DATA) {
       if (query.includes(fest.id.replace(/-/g, ' ')) || query.includes(fest.name.toLowerCase().split(' ')[0])) {
         return {
@@ -301,24 +303,86 @@ export function queryLocalVedicBrain(rawQuery) {
     }
   }
 
-  // Fallback: If not matched in local catalog, return null to delegate to Gemini or general guide
   return null;
 }
 
 /**
- * Layer 2: Call Google Gemini API
+ * Layer 2: OpenRouter AI (DeepSeek, Claude, Llama) with High Speed
+ */
+export async function queryOpenRouterAI(userPrompt, apiKey, history = []) {
+  if (!apiKey || !apiKey.trim()) {
+    throw new Error('No OpenRouter API key provided');
+  }
+
+  const messages = [
+    { role: 'system', content: VEDIC_SYSTEM_INSTRUCTION }
+  ];
+
+  const recentHistory = history.slice(-6);
+  for (const msg of recentHistory) {
+    if (msg.sender === 'user') {
+      messages.push({ role: 'user', content: msg.text });
+    } else if (msg.sender === 'bot') {
+      messages.push({ role: 'assistant', content: msg.text });
+    }
+  }
+
+  messages.push({ role: 'user', content: userPrompt });
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : 'https://maheshreddy2103.github.io/sanatan/',
+        'X-Title': 'Sanatan World'
+      },
+      body: JSON.stringify({
+        model: 'deepseek/deepseek-chat',
+        messages: messages,
+        max_tokens: 800,
+        temperature: 0.7
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      const message = errData?.error?.message || `OpenRouter status ${response.status}`;
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+    const replyText = data?.choices?.[0]?.message?.content;
+
+    if (!replyText) {
+      throw new Error('Empty response received from OpenRouter AI');
+    }
+
+    return replyText;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+/**
+ * Layer 3: Dedicated Google Gemini API
  */
 export async function queryGeminiAI(userPrompt, apiKey, history = []) {
   if (!apiKey || !apiKey.trim()) {
-    throw new Error('No API key provided');
+    throw new Error('No Gemini API key provided');
   }
 
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
 
-  // Format conversation history for Gemini
   const contents = [];
-
-  // Add previous turns (up to last 6 messages to keep context lean)
   const recentHistory = history.slice(-6);
   for (const msg of recentHistory) {
     contents.push({
@@ -327,7 +391,6 @@ export async function queryGeminiAI(userPrompt, apiKey, history = []) {
     });
   }
 
-  // Add the current user prompt
   contents.push({
     role: 'user',
     parts: [{ text: userPrompt }]
@@ -340,7 +403,7 @@ export async function queryGeminiAI(userPrompt, apiKey, history = []) {
     },
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 800,
+      maxOutputTokens: 1000,
       topP: 0.95
     }
   };
@@ -360,12 +423,211 @@ export async function queryGeminiAI(userPrompt, apiKey, history = []) {
   }
 
   const data = await response.json();
-  const candidate = data?.candidates?.[0];
-  const replyText = candidate?.content?.parts?.[0]?.text;
+  const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!replyText) {
     throw new Error('Empty response received from Gemini');
   }
 
   return replyText;
+}
+
+/**
+ * Layer 4: Free Zero-Config Universal Vedic AI (Open-ended Prashna Engine - No Key Required!)
+ */
+export async function queryFreeVedicAI(userPrompt, history = []) {
+  const messages = [
+    { role: 'system', content: VEDIC_SYSTEM_INSTRUCTION }
+  ];
+
+  const recentHistory = history.slice(-4);
+  for (const msg of recentHistory) {
+    if (msg.sender === 'user') {
+      messages.push({ role: 'user', content: msg.text });
+    } else if (msg.sender === 'bot') {
+      messages.push({ role: 'assistant', content: msg.text });
+    }
+  }
+
+  messages.push({ role: 'user', content: userPrompt });
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const response = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: messages,
+        model: 'openai-fast',
+        max_tokens: 1000
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`AI service status ${response.status}`);
+    }
+
+    const text = await response.text();
+    if (!text || !text.trim()) {
+      throw new Error('Empty response from AI engine');
+    }
+
+    return text.trim();
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+/**
+ * Layer 5: Deep Offline Scriptural Matrix Fallback
+ */
+export function getDeepOfflineVedicAnswer(rawQuery) {
+  const q = rawQuery.toLowerCase();
+
+  // 1. Mind control, anxiety, anger, overthinking
+  if (q.includes('mind') || q.includes('anger') || q.includes('anxiety') || q.includes('stress') || q.includes('overthinking') || q.includes('peace') || q.includes('depression')) {
+    return `🙏 **Vedic Guidance on Mastering the Mind & Inner Peace**\n\n` +
+           `In the *Bhagavad Gita* (Chapter 6, Verse 35), Arjuna raises this exact struggle—that the mind is turbulent and difficult to control. Sri Krishna responds:\n\n` +
+           `> **असंशयं महाबाहो मनो दुर्निग्रहं चलम् ।**\n` +
+           `> **अभ्यासेन तु कौन्तेय वैराग्येण च गृह्यते ॥**\n` +
+           `> *(Undoubtedly, O mighty-armed Arjuna, the mind is restless and hard to master; but through regular spiritual practice (Abhyasa) and detachment from outcomes (Vairagya), it can be subdued.)*\n\n` +
+           `**Practical Vedic Steps to Calm the Mind:**\n` +
+           `• **Pranayama & Japa:** Practice Nadi Shodhana (Alternate Nostril Breathing) followed by 108 chants of the *Gayatri* or *Om Namah Shivaya* mantra during Brahma Muhurta.\n` +
+           `• **Witness Consciousness (Sakshi Bhava):** You are not your thoughts or emotional storms; you are the eternal, unchanging consciousness (*Atman*) observing them.\n` +
+           `• **Karma Yoga:** Perform your immediate duties sincerely without obsessing over future results (*Karmanye vadhikaraste ma phaleshu kadachana*).`;
+  }
+
+  // 2. Bed of arrows / Bhishma Pitamaha
+  if (q.includes('bhishma') || q.includes('bed of arrows') || q.includes('arrows') || q.includes('sharashayya')) {
+    return `🏹 **Why Did Bhishma Choose the Bed of Arrows (Sharashayya)?**\n\n` +
+           `Pitamaha Bhishma chose to lie on the bed of arrows (*Sharashayya*) rather than leave his body immediately due to three sacred reasons:\n\n` +
+           `• **The Boon of Ichha-Mrityu (Death by Choice):** Blessed by his father King Shantanu, Bhishma could only die when he willed it. He chose not to abandon his body while the Sun was in *Dakshinayana* (the southern transit associated with night of the devas).\n` +
+           `• **Awaiting Uttarayana:** He waited until the auspicious *Uttarayana* (the northward journey of Surya on Makar Sankranti), which scriptures declare leads the departed soul towards *Brahma-loka* (higher realms of light and liberation).\n` +
+           `• **Transmitting the Eternal Dharma:** While lying on the arrows, Bhishma imparted the crowning jewel of ethical governance (*Raja Dharma*) and revealed the supreme **Vishnu Sahasranama** (1,000 Holy Names of Bhagavan Vishnu) to King Yudhishthira, and purified all lingering karmic impressions of the Kaurava assembly.`;
+  }
+
+  // 3. Karma, Destiny, Why bad things happen
+  if (q.includes('why bad') || q.includes('karma') || q.includes('destiny') || q.includes('fate') || q.includes('justice') || q.includes('suffering')) {
+    return `☸️ **The Inscrutable Dynamics of Karma & Destiny**\n\n` +
+           `Sanatan Dharma explains that suffering in this life is not punishment from an angry deity, but the unfolding of karmic impressions across lifetimes (*Gahana Karmano Gatih* - Bhagavad Gita 4.17):\n\n` +
+           `• **Sanchita Karma:** The vast accumulated reservoir of all past actions waiting in latency.\n` +
+           `• **Prarabdha Karma:** The portion of past karma that has ripened to form your present body, circumstances, and life lessons.\n` +
+           `• **Agami / Kriyamana Karma:** The actions you perform right now with free will and moral discernment (*Viveka*).\n\n` +
+           `Even when Prarabdha brings hardships, your response remains in your hands. Sincere prayer, charity (*Dana*), mantra japa, and righteousness (*Satya & Ahimsa*) mitigate difficult karmic debts and generate uplifting spiritual momentum.`;
+  }
+
+  // 4. Death, Loss of Loved Ones, Grief
+  if (q.includes('death') || q.includes('grief') || q.includes('loss') || q.includes('dying') || q.includes('afterlife') || q.includes('passed away')) {
+    return `🕊️ **Vedic Comfort on Grief and the Eternal Atman**\n\n` +
+           `The Upanishads and the *Bhagavad Gita* offer the highest solace in times of bereavement by revealing the immortality of the soul:\n\n` +
+           `> **न जायते म्रियते वा कदाचिन्नायं भूत्वा भविता वा न भूयः ।**\n` +
+           `> **अजो नित्यः शाश्वतोऽयं पुराणो न हन्यते हन्यमाने शरीरे ॥** *(Gita 2.20)*\n` +
+           `> *(The soul is never born, nor does it ever die. It is unborn, eternal, ever-existing, and primeval. It is not destroyed when the mortal body perishes.)*\n\n` +
+           `Just as a person discards worn garments and puts on new ones, the Atman casts off an aged body to take a new birth. Chanting *Maha Mrityunjaya Mantra* or reciting the *Bhagavad Gita Chapter 12 and 15* sends uplifting spiritual vibrations and peace to departed souls.`;
+  }
+
+  // 5. Advaita vs Dvaita vs Vishishtadvaita
+  if (q.includes('advaita') || q.includes('dvaita') || q.includes('vishishtadvaita') || q.includes('philosophy') || q.includes('schools')) {
+    return `🕉️ **The Three Crown Jewels of Vedanta Philosophy**\n\n` +
+           `Sanatan Dharma encompasses complementary perspectives to comprehend the Supreme Reality (*Brahman*) and the individual soul (*Jivatman*):\n\n` +
+           `• **Advaita (Non-Dualism - Sri Adi Shankaracharya):**\n` +
+           `*Brahma Satyam Jagan Mithya, Jivo Brahmaiva Naparah.* The Supreme Brahman alone is absolute reality; the world is an experiential manifestation (*Maya*); and the true inner Self (*Atman*) is identical to Brahman.\n\n` +
+           `• **Vishishtadvaita (Qualified Non-Dualism - Sri Ramanujacharya):**\n` +
+           `Brahman (Bhagavan Narayana) is the organic whole, and all souls and cosmic matter are real attributes or limbs of the Divine, like rays radiating from the Sun. Liberation is attained through loving surrender (*Prapatti/Bhakti*).\n\n` +
+           `• **Dvaita (Dualism - Sri Madhvacharya):**\n` +
+           `There is an eternal, fundamental distinction between the Supreme God (*Paramatman*), the individual souls (*Jiva*), and inert matter (*Jada*). Complete devotion (*Bhakti*) to Vishnu grants divine grace and eternal bliss.`;
+  }
+
+  // General Vedic Wisdom Fallback
+  return `🙏 **Namaste! Wisdom of Sanatan Dharma**\n\n` +
+         `*"यतो धर्मस्ततो जयः"* — *Where there is Dharma (Righteous Truth), there is Victory.*\n\n` +
+         `Sanatan Dharma guides every human life along four fundamental pursuits (*Purusharthas*):\n` +
+         `• **Dharma:** Ethical living, truthfulness, and fulfillment of natural duty.\n` +
+         `• **Artha:** Honest, virtuous livelihood and material sustenance.\n` +
+         `• **Kama:** Wholesome aesthetic joy and emotional fulfillment aligned with ethics.\n` +
+         `• **Moksha:** The ultimate liberation of the soul from sorrow and cycles of rebirth into infinite bliss.\n\n` +
+         `💡 *You can ask any open-ended Prashna on epics, rituals, mantras, or life guidance. Sanatan Mitr synthesizes timeless Vedic insights to illuminate your spiritual path.*`;
+}
+
+/**
+ * Universal Multi-Tier Query Orchestrator
+ * Priority 1: OpenRouter AI (sk-or-v1-...) with DeepSeek / Claude
+ * Priority 2: Google Gemini AI (AIzaSy...)
+ * Priority 3: Free Zero-Config Universal Vedic AI (Open-ended, No Key Required!)
+ * Priority 4: Deep Offline Scriptural Matrix
+ */
+export async function queryUniversalVedicAI(userPrompt, userApiKey, history = []) {
+  const envKey = (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_AI_API_KEY || import.meta.env?.VITE_OPENROUTER_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY)) || '';
+  const effectiveKey = (userApiKey && userApiKey.trim()) || envKey;
+
+  // 1. Try OpenRouter AI
+  if (effectiveKey && (effectiveKey.startsWith('sk-or-v1-') || effectiveKey.startsWith('sk-'))) {
+    try {
+      const openRouterReply = await queryOpenRouterAI(userPrompt, effectiveKey, history);
+      return {
+        text: openRouterReply,
+        source: 'openrouter',
+        needsKey: false
+      };
+    } catch (err) {
+      console.warn('OpenRouter query failed, trying next provider:', err);
+    }
+  }
+
+  // 2. Try Google Gemini API
+  if (effectiveKey && effectiveKey.startsWith('AIzaSy')) {
+    try {
+      const geminiReply = await queryGeminiAI(userPrompt, effectiveKey, history);
+      return {
+        text: geminiReply,
+        source: 'gemini',
+        needsKey: false
+      };
+    } catch (err) {
+      console.warn('Gemini query failed, trying next provider:', err);
+    }
+  }
+
+  // 3. If generic key provided, try OpenRouter then Gemini
+  if (effectiveKey) {
+    try {
+      const reply = await queryOpenRouterAI(userPrompt, effectiveKey, history);
+      return { text: reply, source: 'openrouter', needsKey: false };
+    } catch (e1) {
+      try {
+        const reply = await queryGeminiAI(userPrompt, effectiveKey, history);
+        return { text: reply, source: 'gemini', needsKey: false };
+      } catch (e2) {
+        console.warn('Configured keyed APIs failed, falling back to Free AI');
+      }
+    }
+  }
+
+  // 4. Try Free Zero-Config Universal Vedic AI
+  try {
+    const freeAiReply = await queryFreeVedicAI(userPrompt, history);
+    return {
+      text: freeAiReply,
+      source: 'free_ai',
+      needsKey: false
+    };
+  } catch (err) {
+    console.warn('Free AI query failed or throttled, falling back to Deep Vedic Wisdom Matrix:', err);
+  }
+
+  // 5. Fallback to Deep Offline Scriptural Matrix
+  const offlineAnswer = getDeepOfflineVedicAnswer(userPrompt);
+  return {
+    text: offlineAnswer,
+    source: 'offline_wisdom',
+    needsKey: !effectiveKey
+  };
 }

@@ -4,15 +4,15 @@ import {
   Trash2, ExternalLink, ShieldCheck,
   BookOpen, Calendar, MapPin, Compass
 } from 'lucide-react';
-import { queryLocalVedicBrain, queryGeminiAI } from '../utils/vedicChatbotBrain';
+import { queryLocalVedicBrain, queryGeminiAI, queryUniversalVedicAI } from '../utils/vedicChatbotBrain';
 
 const STARTER_PROMPTS = [
   { label: "Today's Panchang & Rahu Kaal", icon: Calendar, text: "What is today's Panchang and Rahu Kaal?" },
+  { label: "Why Bhishma chose bed of arrows?", icon: Sparkles, text: "Why did Bhishma choose the bed of arrows?" },
   { label: "6.5L+ Temples in India", icon: MapPin, text: "Tell me about the Temples of India map portal" },
   { label: "Maha Mrityunjaya Mantra", icon: Compass, text: "Explain Maha Mrityunjaya Mantra and its meaning" },
-  { label: "Ekadashi Vrat Rules", icon: BookOpen, text: "What are the fasting rules for Ekadashi?" },
+  { label: "Overcoming Anxiety (Gita)", icon: BookOpen, text: "What does Bhagavad Gita teach about overcoming anxiety and overthinking?" },
   { label: "Who is Adi Shankaracharya?", icon: Sparkles, text: "Who was Adi Shankaracharya and what is Advaita?" },
-  { label: "How to find inner peace?", icon: Sparkles, text: "What does Sanatan Dharma teach about finding inner peace and handling stress?" },
 ];
 
 export default function SanatanMitrChatbot({ onNavigate }) {
@@ -26,7 +26,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
       {
         id: 'welcome',
         sender: 'bot',
-        text: `ॐ नमो नारायणाय! Pranam! I am **Sanatan Mitr (सनातन मित्र)**, your Vedic Spiritual Companion.\n\nI can instantly answer questions about **6.5 Lakh+ Temples**, **Today's Panchang & Rahu Kaal**, **Mantras**, **Deities**, **Gurus & Rishis**, and **Sacred Scriptures**.\n\nYou can also connect your free **Google Gemini API** for deep open-ended philosophical guidance. How may I serve your spiritual journey today?`,
+        text: `ॐ नमो नारायणाय! Pranam! I am **Sanatan Mitr (सनातन मित्र)**, your Universal Vedic Spiritual Companion.\n\nAsk me **ANY PRASHNA (प्रश्न)** on Sanatan Dharma, life dilemmas, scriptures, rituals, or meditation!\n\nI can also instantly provide **Today's Panchang & Rahu Kaal**, details on **6.5 Lakh+ Temples**, and sacred **Mantras**. How may I guide you today?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ];
@@ -34,7 +34,12 @@ export default function SanatanMitrChatbot({ onNavigate }) {
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [apiKey, setApiKey] = useState(() => {
+    return localStorage.getItem('vedic_ai_key') || 
+      localStorage.getItem('gemini_api_key') || 
+      (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_AI_API_KEY || import.meta.env?.VITE_OPENROUTER_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY)) || 
+      '';
+  });
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [tempKey, setTempKey] = useState('');
   const [isHovered, setIsHovered] = useState(false);
@@ -60,8 +65,10 @@ export default function SanatanMitrChatbot({ onNavigate }) {
     const trimmed = tempKey.trim();
     setApiKey(trimmed);
     if (trimmed) {
+      localStorage.setItem('vedic_ai_key', trimmed);
       localStorage.setItem('gemini_api_key', trimmed);
     } else {
+      localStorage.removeItem('vedic_ai_key');
       localStorage.removeItem('gemini_api_key');
     }
     setShowKeyModal(false);
@@ -97,7 +104,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
     setIsLoading(true);
 
     try {
-      // Step 1: Query Local Brain (Layer 1)
+      // Step 1: Query Local High-Precision Catalog (Panchang, Temples, Mantras, Festivals)
       const localResult = queryLocalVedicBrain(query);
 
       if (localResult) {
@@ -106,54 +113,31 @@ export default function SanatanMitrChatbot({ onNavigate }) {
           sender: 'bot',
           text: localResult.text,
           action: localResult.action,
+          source: 'local',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         setMessages(prev => [...prev, botMsg]);
       } else {
-        // Step 2: Open-ended question - Check Gemini API (Layer 2)
-        if (apiKey) {
-          try {
-            const aiReply = await queryGeminiAI(query, apiKey, messages);
-            const botMsg = {
-              id: 'bot-' + Date.now(),
-              sender: 'bot',
-              text: aiReply,
-              source: 'gemini',
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            setMessages(prev => [...prev, botMsg]);
-          } catch (apiErr) {
-            console.error('Gemini API Error:', apiErr);
-            const errorMsg = {
-              id: 'bot-' + Date.now(),
-              sender: 'bot',
-              text: `⚠️ **Notice from Gemini API:** ${apiErr.message}\n\nPlease verify your Google Gemini API key or continue with our built-in Vedic knowledge base for Temples, Panchang, Mantras, and Scriptures.`,
-              needsKey: true,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            setMessages(prev => [...prev, errorMsg]);
-          }
-        } else {
-          // No API key configured: provide thoughtful spiritual answer + offer Gemini connection
-          const generalWisdom = getGeneralVedicWisdom(query);
-          const botMsg = {
-            id: 'bot-' + Date.now(),
-            sender: 'bot',
-            text: generalWisdom,
-            needsKey: true,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-          setMessages(prev => [...prev, botMsg]);
-        }
+        // Step 2: Open-ended Prashna - Universal Multi-tier Vedic AI (OpenRouter, Gemini, or Free AI)
+        const aiResponse = await queryUniversalVedicAI(query, apiKey, messages);
+        const botMsg = {
+          id: 'bot-' + Date.now(),
+          sender: 'bot',
+          text: aiResponse.text,
+          source: aiResponse.source, // 'openrouter' | 'gemini' | 'free_ai' | 'offline_wisdom'
+          needsKey: aiResponse.needsKey,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, botMsg]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Chatbot error:', err);
       setMessages(prev => [
         ...prev,
         {
           id: 'bot-err-' + Date.now(),
           sender: 'bot',
-          text: `Namaste. An unexpected error occurred. Please try asking in another way, or ask about Panchang, Temples, Mantras, or Gurus.`,
+          text: `Namaste. I am meditating upon your prashna. Please rephrase or ask about scriptures, temples, mantras, or panchang.`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
@@ -325,7 +309,9 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                   color: 'rgba(254, 249, 231, 0.75)',
                   margin: '2px 0 0 0'
                 }}>
-                  {apiKey ? '✨ Google Gemini AI Connected' : '⚡ Local Vedic Knowledge Active'}
+                  {apiKey 
+                    ? (apiKey.startsWith('sk-') ? '✨ OpenRouter AI Connected (DeepSeek)' : '✨ Gemini AI Connected') 
+                    : '🕉️ Universal Vedic AI Active'}
                 </p>
               </div>
             </div>
@@ -336,7 +322,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                   setTempKey(apiKey);
                   setShowKeyModal(true);
                 }}
-                title={apiKey ? "Gemini API Key Configured" : "Add Free Gemini API Key"}
+                title={apiKey ? "AI API Key Configured" : "Configure AI API Key"}
                 style={{
                   padding: '7px',
                   borderRadius: '8px',
@@ -511,7 +497,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                   marginTop: '4px',
                   padding: '0 4px'
                 }}>
-                  {msg.timestamp} {msg.source === 'gemini' && '• Gemini AI'}
+                  {msg.timestamp} {msg.source === 'openrouter' ? '• Vedic AI (DeepSeek)' : msg.source === 'gemini' ? '• Gemini AI' : msg.source === 'free_ai' ? '• Vedic AI' : msg.source === 'local' ? '• Local Catalog' : ''}
                 </span>
               </div>
             ))}
@@ -674,7 +660,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                   fontSize: '17px',
                   margin: 0
                 }}>
-                  Connect Google Gemini AI
+                  Connect Vedic AI (OpenRouter / Gemini)
                 </h3>
               </div>
               <button
@@ -692,7 +678,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
             </div>
 
             <p style={{ fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
-              To unlock full conversational AI with **Sanatan Mitr** for deep spiritual questions, connect a free API key from **Google AI Studio**.
+              Sanatan Mitr is already configured with AI to answer any question! You can also connect your own **OpenRouter Key** (supports DeepSeek / Claude) or **Google Gemini API Key** for private rate limits.
             </p>
 
             <div style={{
@@ -707,36 +693,23 @@ export default function SanatanMitrChatbot({ onNavigate }) {
             }}>
               <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-saffron)' }}>
                 <ShieldCheck style={{ width: '16px', height: '16px', color: '#10b981' }} />
-                <span>100% Free & Private</span>
+                <span>Private & Secure Local Storage</span>
               </div>
               <p style={{ margin: 0, lineHeight: '1.5', color: 'var(--text-secondary)' }}>
-                • Google provides a free API key with no credit card required.<br />
-                • Your key is saved locally in your own browser's storage and is never sent to any external server.
+                • Supports <strong>OpenRouter API Keys</strong> (<code>sk-or-v1-...</code>) or <strong>Google Gemini API Keys</strong> (<code>AIzaSy...</code>).<br />
+                • Your key is saved strictly in your own browser's local storage and never shared.
               </p>
-              <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontWeight: '700',
-                  color: 'var(--accent-saffron)',
-                  textDecoration: 'underline',
-                  marginTop: '4px'
-                }}
-              >
-                Get your free API key from Google AI Studio →
-              </a>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ fontSize: '12px', fontWeight: '600' }}>
-                Gemini API Key
+                OpenRouter or Gemini API Key
               </label>
               <input
                 type="password"
                 value={tempKey}
                 onChange={(e) => setTempKey(e.target.value)}
-                placeholder="AIzaSy..."
+                placeholder="sk-or-v1-... or AIzaSy..."
                 style={{
                   width: '100%',
                   fontSize: '13px',
@@ -764,6 +737,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                   onClick={() => {
                     setTempKey('');
                     setApiKey('');
+                    localStorage.removeItem('vedic_ai_key');
                     localStorage.removeItem('gemini_api_key');
                     setShowKeyModal(false);
                   }}
