@@ -1,0 +1,67 @@
+{
+  "name": "Sanatan Dharma — The Eternal Way",
+  "short_name": "Sanatan",
+  "description": "Explore timeless Vedic wisdom, 6.5 Lakh+ temples map, live Panchang, sacred mantras, and Sanatan Mitr AI.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#2b1d15",
+  "theme_color": "#801818",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["lifestyle", "education", "books", "reference"],
+  "shortcuts": [
+    {
+      "name": "Vedic Panchang",
+      "short_name": "Panchang",
+      "description": "Check today's Tithi, Nakshatra & Rahu Kaal",
+      "url": "./#/panchang",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Temples of India",
+      "short_name": "Temples",
+      "description": "Explore 6.5L+ temples map",
+      "url": "./#/temples",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sacred Mantras & Japa",
+      "short_name": "Mantras",
+      "description": "Chant mantras with Japa Mala counter",
+      "url": "./#/mantras",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sanatan Mitr AI",
+      "short_name": "Vedic AI",
+      "description": "Ask spiritual prashnas to Sanatan Mitr",
+      "url": "./#/",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

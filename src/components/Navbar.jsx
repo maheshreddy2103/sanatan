@@ -17,14 +17,47 @@ import {
   Award,
   Layers,
   Landmark,
-  Calendar
+  Calendar,
+  Download
 } from 'lucide-react';
 import { playOmDrone } from '../utils/sound';
 
 export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme, onOpenSearch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
+  const [navDeferredPrompt, setNavDeferredPrompt] = useState(null);
   const dropdownRef = useRef(null);
+
+  // Check PWA install capability
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) return;
+
+    const handlePrompt = (e) => {
+      e.preventDefault();
+      setNavDeferredPrompt(e);
+      setCanInstall(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handlePrompt);
+    window.addEventListener('appinstalled', () => setCanInstall(false));
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handlePrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (navDeferredPrompt) {
+      navDeferredPrompt.prompt();
+      const choice = await navDeferredPrompt.userChoice;
+      if (choice.outcome === 'accepted') setCanInstall(false);
+      setNavDeferredPrompt(null);
+    } else {
+      alert('To install Sanatan: Tap your browser menu (⋮) and select "Install app" or "Add to Home screen".');
+    }
+  };
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -340,6 +373,30 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
             <Volume2 size={18} />
           </button>
 
+          {/* PWA Install Button */}
+          {canInstall && (
+            <button
+              onClick={handleInstallClick}
+              className="btn btn-outline"
+              style={{
+                padding: '6px 12px',
+                fontSize: '0.82rem',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--accent-saffron)',
+                borderColor: 'var(--accent-saffron)',
+                backgroundColor: 'rgba(217, 83, 30, 0.08)'
+              }}
+              title="Install Sanatan as Native App"
+            >
+              <Download size={15} />
+              <span className="install-label" style={{ display: 'none' }}>Install App</span>
+            </button>
+          )}
+
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
@@ -448,6 +505,32 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
               </button>
             );
           })}
+
+          {canInstall && (
+            <button
+              onClick={handleInstallClick}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #d9531e 0%, #c69214 100%)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                marginTop: '10px',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              <Download size={18} />
+              <span>Install Sanatan App</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -456,6 +539,7 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
         @media (min-width: 992px) {
           .desktop-nav { display: flex !important; }
           .search-label { display: inline !important; }
+          .install-label { display: inline !important; }
           .mobile-menu-btn { display: none !important; }
         }
         @media (max-width: 991px) {

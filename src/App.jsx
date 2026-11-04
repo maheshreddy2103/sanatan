@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import SanatanMitrChatbot from './components/SanatanMitrChatbot';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 // Pages
 import HomeView from './pages/HomeView';
@@ -187,6 +188,9 @@ export default function App() {
 
       {/* Floating Vedic AI Spiritual Guide (सनातन मित्र) */}
       <SanatanMitrChatbot onNavigate={navigateTo} />
+
+      {/* Progressive Web App (PWA) Offline & Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 }
