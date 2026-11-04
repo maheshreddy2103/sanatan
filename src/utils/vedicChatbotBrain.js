@@ -33,7 +33,44 @@ export const VEDIC_SYSTEM_INSTRUCTION = `You are "Sanatan Mitr" (सनातन
 export function queryLocalVedicBrain(rawQuery) {
   const query = rawQuery.toLowerCase().trim();
 
-  // 1. Panchang, Tithi, Rahu Kaal, Timings
+  // 1. If this is an open-ended question or conversational query -> Pass directly to Universal AI!
+  // Do NOT intercept with local summaries when the seeker is asking a real question!
+  const hasQuestionIntent = (
+    query.includes('what') ||
+    query.includes('why') ||
+    query.includes('how') ||
+    query.includes('when') ||
+    query.includes('where') ||
+    query.includes('explain') ||
+    query.includes('essential') ||
+    query.includes('things') ||
+    query.includes('mala') ||
+    query.includes('deeksha') ||
+    query.includes('diksha') ||
+    query.includes('rules') ||
+    query.includes('vrat') ||
+    query.includes('fasting') ||
+    query.includes('difference') ||
+    query.includes('meaning') ||
+    query.includes('significance') ||
+    query.includes('story') ||
+    query.includes('history') ||
+    query.includes('teach') ||
+    query.includes('tell me about') ||
+    query.includes('guide') ||
+    query.includes('steps') ||
+    query.includes('items') ||
+    query.includes('should i') ||
+    query.includes('can i') ||
+    query.includes('?') ||
+    query.split(/\s+/).length >= 4
+  );
+
+  if (hasQuestionIntent) {
+    return null;
+  }
+
+  // 2. Panchang, Tithi, Rahu Kaal, Timings (Only for direct lookup)
   if (
     query.includes('panchang') ||
     query.includes('tithi') ||
@@ -211,31 +248,31 @@ export function queryLocalVedicBrain(rawQuery) {
     };
   }
 
-  // 5. Deities
+  // 5. Deities (Only for direct single-entity lookup, e.g. "ayyappa", "lord ayyappa")
   for (const deity of deitiesData) {
-    const nameMatch = query.includes(deity.name.toLowerCase());
-    const sanskritMatch = deity.sanskrit && query.includes(deity.sanskrit.toLowerCase());
-    if (nameMatch || sanskritMatch) {
+    const dName = deity.name.toLowerCase();
+    const isDirectMatch = (query === dName || query === `lord ${dName}` || query === `shri ${dName}` || query === `sri ${dName}` || query === `who is ${dName}`);
+    if (isDirectMatch) {
+      const knownFor = deity.knownFor || 'Supreme Divinity in Sanatan Dharma';
+      const vahanaText = deity.vahana ? `• **Vahana (Vehicle):** ${deity.vahana}\n` : '';
       return {
-        text: `✨ **${deity.name} (${deity.sanskrit || ''})** — *${deity.title || 'Supreme Divinity'}*\n\n` +
-              `${deity.description}\n\n` +
-              (deity.attributes ? `• **Attributes:** ${deity.attributes.join(', ')}\n` : '') +
-              (deity.vehicle ? `• **Vahana (Vehicle):** ${deity.vehicle}\n` : '') +
-              (deity.consort ? `• **Consort:** ${deity.consort}\n` : '') +
-              (deity.festivals ? `• **Major Festivals:** ${deity.festivals.join(', ')}\n` : '') +
-              (deity.mantra ? `\n> *Mantra:* "${deity.mantra}"` : ''),
+        text: `✨ **Lord ${deity.name}** — *${knownFor}*\n\n` +
+              `Lord ${deity.name} is deeply revered across Sanatan Dharma, embodying divine cosmic virtues and spiritual grace.\n\n` +
+              vahanaText +
+              (deity.incarnations && deity.incarnations.length > 0 ? `• **Incarnations / Forms:** ${deity.incarnations.join(', ')}\n` : ''),
         action: { label: `Explore ${deity.name}'s Sacred Page`, route: `#/deities/${deity.id}` }
       };
     }
   }
 
-  // 6. Gurus
+  // 6. Gurus (Only for direct entity lookup)
   for (const guru of gurusData) {
-    if (query.includes(guru.name.toLowerCase()) || (guru.title && query.includes(guru.title.toLowerCase()))) {
+    const gName = guru.name.toLowerCase();
+    if (query === gName || query === `guru ${gName}` || query === `who is ${gName}`) {
       return {
         text: `🙏 **${guru.name}** (${guru.period})\n\n` +
               `*${guru.title}*\n\n` +
-              `${guru.bio || guru.description}\n\n` +
+              `${guru.bio || guru.description || 'Revered spiritual master in Sanatan Dharma.'}\n\n` +
               (guru.corePhilosophy ? `• **Core Teaching:** ${guru.corePhilosophy}\n` : '') +
               (guru.ashram ? `• **Main Center / Peetham:** ${guru.ashram}\n` : '') +
               (guru.famousQuote ? `\n> "${guru.famousQuote}"` : ''),
@@ -244,13 +281,14 @@ export function queryLocalVedicBrain(rawQuery) {
     }
   }
 
-  // 7. Rishis
+  // 7. Rishis (Only for direct lookup)
   for (const rishi of rishisData) {
-    if (query.includes(rishi.name.toLowerCase())) {
+    const rName = rishi.name.toLowerCase();
+    if (query === rName || query === `rishi ${rName}` || query === `who is ${rName}`) {
       return {
         text: `🌿 **Maharishi ${rishi.name}**\n\n` +
               `*${rishi.title || 'Vedic Seer'}*\n\n` +
-              `${rishi.bio || rishi.description}\n\n` +
+              `${rishi.bio || rishi.description || 'Ancient Vedic seer and sage.'}\n\n` +
               (rishi.contributions ? `• **Scriptural Contributions:** ${rishi.contributions.join(', ')}\n` : '') +
               (rishi.gotra ? `• **Gotra Lineage:** ${rishi.gotra}\n` : ''),
         action: { label: `Learn more about Maharishi ${rishi.name}`, route: `#/rishis/${rishi.id}` }
@@ -544,6 +582,17 @@ export function getDeepOfflineVedicAnswer(rawQuery) {
            `Brahman (Bhagavan Narayana) is the organic whole, and all souls and cosmic matter are real attributes or limbs of the Divine, like rays radiating from the Sun. Liberation is attained through loving surrender (*Prapatti/Bhakti*).\n\n` +
            `• **Dvaita (Dualism - Sri Madhvacharya):**\n` +
            `There is an eternal, fundamental distinction between the Supreme God (*Paramatman*), the individual souls (*Jiva*), and inert matter (*Jada*). Complete devotion (*Bhakti*) to Vishnu grants divine grace and eternal bliss.`;
+  }
+
+  // 6. Lord Ayyappa, Sabarimala, Ayyappa Mala, Deeksha
+  if (q.includes('ayyappa') || q.includes('sabarimala') || q.includes('mala') || q.includes('deeksha') || q.includes('irumudi') || q.includes('vratham')) {
+    return `🏔️ **Essential Disciplines & Items for Ayyappa Mala (Mandala Vratham)**\n\n` +
+           `The Ayyappa Deeksha is a sacred 41-day spiritual penance (*Mandala Vratham*) observed to prepare body, mind, and spirit for the darshan of Lord Ayyappa at Sabarimala:\n\n` +
+           `• **1. The Sacred Mala:** A Tulsi Mala or Rudraksha Mala (typically 108 beads with a Lord Ayyappa locket) worn after receiving initiation from a respected *Guruswami*.\n` +
+           `• **2. Attire:** Simple black, dark blue, or saffron cotton garments representing ascetic detachment and humility.\n` +
+           `• **3. Strict Brahmacharya & Satvik Living:** Complete celibacy, sleeping on the floor on a simple mat, bathing twice daily in cold water, and consuming strictly satvik vegetarian food without onion or garlic.\n` +
+           `• **4. Daily Sadhana & Chanting:** Morning and evening prayer with the sacred chant: *"Swamiye Saranam Ayyappa"* (I surrender unto Lord Ayyappa), treating all fellow devotees as divine *Swamis*.\n` +
+           `• **5. The Irumudi (Two-compartment bag):** Carried during the holy trek, containing the consecrated ghee-filled coconut (*Neyyabhishekam*), camphor, raw rice, and betel leaves to ascend the holy 18 steps (*Pathinettam Padi*).`;
   }
 
   // General Vedic Wisdom Fallback
