@@ -595,6 +595,17 @@ export function getDeepOfflineVedicAnswer(rawQuery) {
            `• **5. The Irumudi (Two-compartment bag):** Carried during the holy trek, containing the consecrated ghee-filled coconut (*Neyyabhishekam*), camphor, raw rice, and betel leaves to ascend the holy 18 steps (*Pathinettam Padi*).`;
   }
 
+  // 7. Goddess Durga, Navratri, Durga Mala / Bhavani Deeksha
+  if (q.includes('durga') || q.includes('bhavani') || q.includes('navratri') || q.includes('chandi')) {
+    return `🌺 **Essential Disciplines & Items for Durga Mala (Bhavani Deeksha)**\n\n` +
+           `The Bhavani / Durga Deeksha is a sacred spiritual vrata observed (often for 21 or 41 days during Sharad Navratri or Chaitra Navratri) in devotion to Supreme Mother Goddess Durga:\n\n` +
+           `• **1. The Sacred Mala:** Spatika (Quartz crystal) Mala, Rudraksha Mala, or Raktachandan (Red Sandalwood) Mala with a Maa Durga locket, sanctified with the Durga Navarna Mantra (*Om Aim Hreem Kleem Chamundayai Viche*).\n` +
+           `• **2. Attire:** Traditional red or saffron clothes, signifying dynamic Shakti, spiritual protection, and surrender.\n` +
+           `• **3. Strict Penance & Satvik Living:** Complete celibacy (Brahmacharya), consuming one satvik meal a day (avoiding non-veg, onion, garlic, and alcohol), barefoot walking, and sleeping on a simple mat.\n` +
+           `• **4. Daily Puja & Chanting:** Morning and evening recitation of *Durga Saptashati* (Devi Mahatmyam), *Lalita Sahasranama*, or *Durga Ashtottara Shatanamavali*, with Kumkum Archana.\n` +
+           `• **5. Deeksha Viramana:** Completing the deeksha with Kanya Puja (worshipping young girls as forms of Maa Durga), Chandi Homa, and receiving darshan at a sacred Shakti Peetha or Devi temple.`;
+  }
+
   // General Vedic Wisdom Fallback
   return `🙏 **Namaste! Wisdom of Sanatan Dharma**\n\n` +
          `*"यतो धर्मस्ततो जयः"* — *Where there is Dharma (Righteous Truth), there is Victory.*\n\n` +

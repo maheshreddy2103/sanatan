@@ -146,17 +146,6 @@ export default function SanatanMitrChatbot({ onNavigate }) {
     }
   };
 
-  const getGeneralVedicWisdom = (q) => {
-    return `🙏 **Wisdom of Sanatan Dharma**\n\n` +
-           `"यतो धर्मस्ततो जयः" (*Where there is Dharma, there is Victory.*)\n\n` +
-           `Sanatan Dharma teaches that every human experience is an opportunity to cultivate four pillars: **Dharma** (Righteous Living), **Artha** (Honest Prosperity), **Kama** (Righteous Fulfillment), and **Moksha** (Inner Freedom).\n\n` +
-           `Whenever facing uncertainty or seeking spiritual clarity:\n` +
-           `• Ground yourself in selfless duty (*Karma Yoga*) without attachment to fruits.\n` +
-           `• Practice regular Japa or Dhyana during Brahma Muhurta.\n` +
-           `• Contemplate the eternal nature of the Self (*Atman*) which transcends temporary changes.\n\n` +
-           `💡 *Tip: For personalized, multi-turn AI spiritual counseling on any specific life situation, you can connect your free Google Gemini API key anytime.*`;
-  };
-
   return (
     <>
       {/* Floating Trigger Button */}
