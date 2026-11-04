@@ -114,14 +114,18 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
       backgroundColor: 'var(--bg-card)',
       borderBottom: '1px solid var(--border-light)',
       backdropFilter: 'blur(10px)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      width: '100%'
     }}>
-      <div className="container" style={{
+      <div style={{
+        maxWidth: '1440px',
+        margin: '0 auto',
+        padding: '0 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         height: '74px',
-        gap: '16px'
+        gap: '12px'
       }}>
         {/* Brand Logo */}
         <div 
@@ -143,14 +147,24 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#fff',
-            fontFamily: 'var(--font-sanskrit)',
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
             boxShadow: '0 4px 12px rgba(217, 83, 30, 0.35)',
-            border: '2px solid rgba(255, 255, 255, 0.4)'
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            flexShrink: 0,
+            overflow: 'hidden'
           }}>
-            ॐ
+            <span style={{
+              fontFamily: "'Noto Serif Devanagari', 'Segoe UI', serif",
+              fontSize: '1.45rem',
+              fontWeight: 700,
+              color: '#ffffff',
+              lineHeight: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: 'translate(1px, 2px)'
+            }}>
+              ॐ
+            </span>
           </div>
           <div>
             <div style={{
@@ -178,11 +192,11 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
           </div>
         </div>
 
-        {/* Desktop Navigation Links (Now a clean 7 items max!) */}
+        {/* Desktop Navigation Links */}
         <nav style={{
           display: 'none',
           alignItems: 'center',
-          gap: '6px'
+          gap: '4px'
         }} className="desktop-nav">
           {navItems.map((item) => {
             const active = isCurrent(item);
@@ -202,21 +216,21 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
                       background: active ? 'var(--bg-surface)' : 'transparent',
                       color: active ? 'var(--accent-saffron)' : 'var(--text-secondary)',
                       border: 'none',
-                      padding: '8px 12px',
+                      padding: '7px 10px',
                       borderRadius: 'var(--radius-sm)',
-                      fontSize: '0.88rem',
+                      fontSize: '0.85rem',
                       fontWeight: active ? 700 : 600,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '5px',
+                      gap: '4px',
                       whiteSpace: 'nowrap',
                       transition: 'all 0.2s ease',
                       borderBottom: active ? '2px solid var(--accent-saffron)' : '2px solid transparent'
                     }}
                   >
                     <span>{item.label}</span>
-                    <ChevronDown size={14} style={{
+                    <ChevronDown size={13} style={{
                       transform: toolsDropdownOpen ? 'rotate(180deg)' : 'none',
                       transition: 'transform 0.2s ease'
                     }} />
@@ -298,14 +312,14 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
                   background: active ? 'var(--bg-surface)' : 'transparent',
                   color: active ? 'var(--accent-saffron)' : 'var(--text-secondary)',
                   border: 'none',
-                  padding: '8px 12px',
+                  padding: '7px 10px',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   fontWeight: active ? 700 : 600,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '4px',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.2s ease',
                   borderBottom: active ? '2px solid var(--accent-saffron)' : '2px solid transparent'
@@ -330,14 +344,14 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
         </nav>
 
         {/* Right Action Icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
           {/* Quick Search */}
           <button
             onClick={onOpenSearch}
             className="btn btn-outline"
             style={{
-              padding: '8px 14px',
-              fontSize: '0.85rem',
+              padding: '7px 12px',
+              fontSize: '0.82rem',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
@@ -345,12 +359,12 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
             }}
             title="Search entire site (Ctrl+K)"
           >
-            <Search size={16} />
+            <Search size={15} />
             <span style={{ display: 'none' }} className="search-label">Search</span>
             <kbd style={{
-              fontSize: '0.7rem',
+              fontSize: '0.68rem',
               background: 'var(--bg-surface)',
-              padding: '2px 6px',
+              padding: '2px 5px',
               borderRadius: '4px',
               border: '1px solid var(--border-light)',
               color: 'var(--text-muted)'
@@ -362,15 +376,19 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
             onClick={playOmDrone}
             className="btn btn-outline"
             style={{
-              width: '38px',
-              height: '38px',
+              width: '36px',
+              height: '36px',
               padding: 0,
               borderRadius: '50%',
-              color: 'var(--accent-gold)'
+              color: 'var(--accent-gold)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
             }}
             title="Chant Sacred Om"
           >
-            <Volume2 size={18} />
+            <Volume2 size={17} />
           </button>
 
           {/* PWA Install Button */}
@@ -379,20 +397,21 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
               onClick={handleInstallClick}
               className="btn btn-outline"
               style={{
-                padding: '6px 12px',
-                fontSize: '0.82rem',
+                padding: '6px 11px',
+                fontSize: '0.8rem',
                 fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '5px',
                 borderRadius: 'var(--radius-full)',
                 color: 'var(--accent-saffron)',
                 borderColor: 'var(--accent-saffron)',
-                backgroundColor: 'rgba(217, 83, 30, 0.08)'
+                backgroundColor: 'rgba(217, 83, 30, 0.08)',
+                flexShrink: 0
               }}
               title="Install Sanatan as Native App"
             >
-              <Download size={15} />
+              <Download size={14} />
               <span className="install-label" style={{ display: 'none' }}>Install App</span>
             </button>
           )}
@@ -402,14 +421,18 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
             onClick={onToggleTheme}
             className="btn btn-outline"
             style={{
-              width: '38px',
-              height: '38px',
+              width: '36px',
+              height: '36px',
               padding: 0,
-              borderRadius: '50%'
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
             }}
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {theme === 'dark' ? <Sun size={18} color="#e5b32e" /> : <Moon size={18} />}
+            {theme === 'dark' ? <Sun size={17} color="#e5b32e" /> : <Moon size={17} />}
           </button>
 
           {/* Mobile Menu Hamburger */}
@@ -538,9 +561,15 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
       <style>{`
         @media (min-width: 992px) {
           .desktop-nav { display: flex !important; }
+          .mobile-menu-btn { display: none !important; }
+        }
+        @media (min-width: 1240px) {
           .search-label { display: inline !important; }
           .install-label { display: inline !important; }
-          .mobile-menu-btn { display: none !important; }
+        }
+        @media (max-width: 1239px) {
+          .search-label { display: none !important; }
+          .install-label { display: none !important; }
         }
         @media (max-width: 991px) {
           .mobile-menu-btn { display: flex !important; }
