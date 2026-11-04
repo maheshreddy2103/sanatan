@@ -4,7 +4,7 @@ import {
   Trash2, ExternalLink, ShieldCheck,
   BookOpen, Calendar, MapPin, Compass
 } from 'lucide-react';
-import { queryLocalVedicBrain, queryGeminiAI, queryUniversalVedicAI } from '../utils/vedicChatbotBrain';
+import { queryLocalVedicBrain, queryGeminiAI, queryUniversalVedicAI, DEFAULT_AI_KEY } from '../utils/vedicChatbotBrain';
 
 const STARTER_PROMPTS = [
   { label: "Today's Panchang & Rahu Kaal", icon: Calendar, text: "What is today's Panchang and Rahu Kaal?" },
@@ -38,6 +38,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
     return localStorage.getItem('vedic_ai_key') || 
       localStorage.getItem('gemini_api_key') || 
       (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_AI_API_KEY || import.meta.env?.VITE_OPENROUTER_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY)) || 
+      DEFAULT_AI_KEY || 
       '';
   });
   const [showKeyModal, setShowKeyModal] = useState(false);
@@ -439,42 +440,6 @@ export default function SanatanMitrChatbot({ onNavigate }) {
                       >
                         <span>{msg.action.label}</span>
                         <ExternalLink style={{ width: '13px', height: '13px' }} />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Connect API Key banner */}
-                  {msg.needsKey && !apiKey && (
-                    <div style={{
-                      marginTop: '10px',
-                      paddingTop: '8px',
-                      borderTop: '1px solid var(--border-light)'
-                    }}>
-                      <button
-                        onClick={() => {
-                          setTempKey(apiKey);
-                          setShowKeyModal(true);
-                        }}
-                        style={{
-                          width: '100%',
-                          textAlign: 'left',
-                          padding: '8px 12px',
-                          borderRadius: '10px',
-                          backgroundColor: 'var(--accent-gold-light)',
-                          border: '1px solid var(--border-strong)',
-                          fontSize: '11px',
-                          color: 'var(--text-primary)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600' }}>
-                          <Key style={{ width: '14px', height: '14px', color: 'var(--accent-saffron)' }} />
-                          <span>Connect Free Google Gemini AI Key</span>
-                        </span>
-                        <span style={{ color: 'var(--accent-saffron)', fontWeight: '700' }}>Setup →</span>
                       </button>
                     </div>
                   )}
