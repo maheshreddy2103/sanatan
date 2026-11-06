@@ -315,8 +315,8 @@ export function queryLocalVedicBrain(rawQuery) {
     if (textMatch) {
       return {
         text: `📖 **${textMatch.name} (${textMatch.sanskrit || ''})**\n\n` +
-              `*Category: ${textMatch.category}*\n\n` +
-              `${textMatch.description}\n\n` +
+              `*Category: ${textMatch.category || 'Vedic Scripture'}*\n\n` +
+              `${textMatch.description || textMatch.summary || 'Sacred scripture of Sanatan Dharma.'}\n\n` +
               (textMatch.significance ? `• **Significance:** ${textMatch.significance}\n` : '') +
               (textMatch.structure ? `• **Structure:** ${textMatch.structure}\n` : ''),
         action: { label: `Read Sacred Chapters of ${textMatch.name}`, route: `#/texts/${textMatch.id}` }
@@ -338,7 +338,7 @@ export function queryLocalVedicBrain(rawQuery) {
     if (belief) {
       return {
         text: `☸️ **${belief.name} (${belief.sanskrit || ''})**\n\n` +
-              `${belief.description}\n\n` +
+              `${belief.description || 'Core philosophical pillar of Sanatan Dharma.'}\n\n` +
               `• **Scriptural Basis:** ${belief.scripture || 'Vedas and Bhagavad Gita'}\n` +
               (belief.application ? `• **Practical Application:** ${belief.application}\n` : ''),
         action: { label: 'Explore Core Beliefs of Sanatan Dharma', route: '#/beliefs' }

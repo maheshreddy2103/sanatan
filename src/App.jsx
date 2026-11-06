@@ -26,6 +26,7 @@ import TemplesPortalView from './pages/TemplesPortalView';
 import GenealogyView from './pages/GenealogyView';
 import QuizView from './pages/QuizView';
 import PanchangView from './pages/PanchangView';
+import VirtualPujaView from './pages/VirtualPujaView';
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState(window.location.hash || '#/');
@@ -158,6 +159,11 @@ export default function App() {
     // Jnana Pariksha (Quiz & Flashcards)
     if (hash === '/quiz' || hash === 'quiz') {
       return <QuizView onNavigate={navigateTo} />;
+    }
+
+    // Virtual Darshan & Puja Altar (डिजिटल पूजा)
+    if (hash === '/puja' || hash === 'puja' || hash === '/darshan' || hash === 'darshan') {
+      return <VirtualPujaView onNavigate={navigateTo} />;
     }
 
     // Default to Home

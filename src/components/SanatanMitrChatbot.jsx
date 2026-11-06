@@ -6,7 +6,7 @@ import {
   PanelLeft, PanelLeftClose, MessageSquare, 
   Plus, Clock, ChevronLeft
 } from 'lucide-react';
-import { queryLocalVedicBrain, queryGeminiAI, queryUniversalVedicAI, DEFAULT_AI_KEY } from '../utils/vedicChatbotBrain';
+import { queryLocalVedicBrain, queryGeminiAI, queryUniversalVedicAI, getDeepOfflineVedicAnswer, DEFAULT_AI_KEY } from '../utils/vedicChatbotBrain';
 
 const STARTER_PROMPTS = [
   { label: "Today's Panchang & Rahu Kaal", icon: Calendar, text: "What is today's Panchang and Rahu Kaal?" },
@@ -272,7 +272,7 @@ export default function SanatanMitrChatbot({ onNavigate }) {
       // Step 1: Query Local High-Precision Catalog (Panchang, Temples, Mantras, Festivals)
       const localResult = queryLocalVedicBrain(query);
 
-      if (localResult) {
+      if (localResult && localResult.text) {
         const botMsg = {
           id: 'bot-' + Date.now(),
           sender: 'bot',
@@ -298,9 +298,9 @@ export default function SanatanMitrChatbot({ onNavigate }) {
         const botMsg = {
           id: 'bot-' + Date.now(),
           sender: 'bot',
-          text: aiResponse.text,
-          source: aiResponse.source,
-          needsKey: aiResponse.needsKey,
+          text: (aiResponse && aiResponse.text) ? aiResponse.text : getDeepOfflineVedicAnswer(query),
+          source: aiResponse?.source || 'offline_wisdom',
+          needsKey: aiResponse?.needsKey || false,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 

@@ -79,8 +79,9 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
       label: 'Interactive Tools', 
       isDropdown: true,
       icon: Layers,
-      matches: ['#/panchang', '#/temple-map', '#/tirtha', '#/genealogy', '#/quiz'],
+      matches: ['#/panchang', '#/temple-map', '#/tirtha', '#/genealogy', '#/quiz', '#/puja'],
       items: [
+        { label: 'Virtual Darshan & Puja', route: '#/puja', icon: Flame, desc: 'Pancha Upachara offerings, flower shower & Maha Aarti' },
         { label: 'Vedic Panchang & Festivals', route: '#/panchang', icon: Calendar, desc: 'Daily Tithi, Nakshatra, Muhurtas & Festival Countdowns' },
         { label: 'Temples of India (6.5L+)', route: '#/temple-map', icon: Landmark, desc: '6.48 Lakh+ temples across 36 States/UTs' },
         { label: 'Tirtha Yatra (Sacred Map)', route: '#/tirtha', icon: MapPin, desc: '12 Jyotirlingas, Char Dham & Shakti Peethas' },
@@ -120,12 +121,14 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
       <div style={{
         maxWidth: '1440px',
         margin: '0 auto',
-        padding: '0 20px',
+        padding: '0 14px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         height: '74px',
-        gap: '12px'
+        gap: '8px',
+        boxSizing: 'border-box',
+        width: '100%'
       }}>
         {/* Brand Logo */}
         <div 
@@ -133,15 +136,15 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
+            gap: '8px',
             cursor: 'pointer',
             userSelect: 'none',
             flexShrink: 0
           }}
         >
           <div style={{
-            width: '42px',
-            height: '42px',
+            width: '40px',
+            height: '40px',
             borderRadius: '50%',
             background: 'linear-gradient(135deg, #d9531e 0%, #c69214 100%)',
             display: 'flex',
@@ -154,14 +157,18 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
           }}>
             <span style={{
               fontFamily: "'Noto Serif Devanagari', 'Segoe UI', serif",
-              fontSize: '1.45rem',
+              fontSize: '1.4rem',
               fontWeight: 700,
               color: '#ffffff',
               lineHeight: 1,
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transform: 'translate(1px, 2px)'
+              width: '100%',
+              height: '100%',
+              margin: 0,
+              padding: 0,
+              userSelect: 'none'
             }}>
               ॐ
             </span>
@@ -169,7 +176,7 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
           <div>
             <div style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: '1.25rem',
+              fontSize: '1.2rem',
               fontWeight: 800,
               letterSpacing: '0.04em',
               lineHeight: 1.1,
@@ -181,7 +188,7 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
               SANATAN
             </div>
             <div style={{
-              fontSize: '0.68rem',
+              fontSize: '0.65rem',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: 'var(--text-muted)',
@@ -196,7 +203,7 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
         <nav style={{
           display: 'none',
           alignItems: 'center',
-          gap: '4px'
+          gap: '2px'
         }} className="desktop-nav">
           {navItems.map((item) => {
             const active = isCurrent(item);
@@ -216,9 +223,9 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
                       background: active ? 'var(--bg-surface)' : 'transparent',
                       color: active ? 'var(--accent-saffron)' : 'var(--text-secondary)',
                       border: 'none',
-                      padding: '7px 10px',
+                      padding: '6px 8px',
                       borderRadius: 'var(--radius-sm)',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       fontWeight: active ? 700 : 600,
                       cursor: 'pointer',
                       display: 'flex',
@@ -312,9 +319,9 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
                   background: active ? 'var(--bg-surface)' : 'transparent',
                   color: active ? 'var(--accent-saffron)' : 'var(--text-secondary)',
                   border: 'none',
-                  padding: '7px 10px',
+                  padding: '6px 8px',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   fontWeight: active ? 700 : 600,
                   cursor: 'pointer',
                   display: 'flex',
@@ -563,13 +570,19 @@ export default function Navbar({ currentRoute, onNavigate, theme, onToggleTheme,
           .desktop-nav { display: flex !important; }
           .mobile-menu-btn { display: none !important; }
         }
-        @media (min-width: 1240px) {
+        @media (min-width: 1380px) {
           .search-label { display: inline !important; }
           .install-label { display: inline !important; }
         }
-        @media (max-width: 1239px) {
+        @media (max-width: 1379px) {
           .search-label { display: none !important; }
           .install-label { display: none !important; }
+        }
+        @media (max-width: 1180px) {
+          .desktop-nav button {
+            padding: 5px 6px !important;
+            font-size: 0.78rem !important;
+          }
         }
         @media (max-width: 991px) {
           .mobile-menu-btn { display: flex !important; }
